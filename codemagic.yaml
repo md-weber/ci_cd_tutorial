@@ -2,15 +2,10 @@ workflows:
   android-workflow:
     name: Android Workflow
     instance_type: mac_mini_m1
-    max_build_duration: 120
+    max_build_duration: 30
     environment:
-      android_signing:
-        - keystore_reference
-      groups:
-        - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS)
       vars:
-        PACKAGE_NAME: "io.codemagic.flutteryaml" # <-- Put your package name here
-        GOOGLE_PLAY_TRACK: "alpha"
+        PACKAGE_NAME: "dev.flutterexplained.ci_cd_tutorial" # <-- Put your package name here
       flutter: stable
     scripts:
       - name: Set up local.properties
@@ -39,8 +34,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - user_1@example.com
-          - user_2@example.com
+          - flutterexp@gmail.com
         notify:
           success: true
           failure: false
@@ -51,15 +45,8 @@ workflows:
   ios-workflow:
     name: iOS Workflow
     instance_type: mac_mini_m1
-    max_build_duration: 120
-    integrations:
-      app_store_connect: codemagic
+    max_build_duration: 30
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: io.codemagic.flutteryaml
-      vars:
-        APP_ID: 1111111111 # <-- Put your APP ID here
       flutter: stable
       xcode: latest
       cocoapods: default
@@ -80,46 +67,6 @@ workflows:
         script: |
           flutter test
         ignore_failure: true
-      - name: Flutter build ipa and automatic versioning
-        script: |
-          flutter build ipa --release \
-            --build-name=1.0.0 \
-            --build-number=$(($(app-store-connect get-latest-app-store-build-number "$APP_ID") + 1)) \
-            --export-options-plist=/Users/builder/export_options.plist
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
-    publishing:
-      # See the following link for details about email publishing - https://docs.codemagic.io/publishing-yaml/distribution/#email
-      email:
-        recipients:
-          - user_1@example.com
-          - user_2@example.com
-        notify:
-          success: true # To receive a notification when a build succeeds
-          failure: false # To not receive a notification when a build fails
-      slack:
-        # See the following link about how to connect your Slack account - https://docs.codemagic.io/publishing-yaml/distribution/#slack
-        channel: "#builds"
-        notify_on_build_start: true # To receive a notification when a build starts
-        notify:
-          success: true # To receive a notification when a build succeeds
-          failure: false # To not receive a notification when a build fails
-      app_store_connect:
-        auth: integration
-        
-        # Configuration related to TestFlight (optional)
-        # Note: This action is performed during post-processing.
-        submit_to_testflight: true
-        beta_groups: # Specify the names of beta tester groups that will get access to the build once it has passed beta review.
-          - group name 1
-          - group name 2
-
-        # Configuration related to App Store (optional)
-        # Note: This action is performed during post-processing.
-        submit_to_app_store: false
-
   web-workflow:
     name: Web app workflow
     max_build_duration: 10
@@ -146,6 +93,6 @@ workflows:
     publishing:
       email:
         recipients:
-          - user_1@example.com
+          - flutterexp@gmail.com
 
 
