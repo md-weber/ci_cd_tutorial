@@ -55,7 +55,9 @@ workflows:
     name: iOS Workflow
     instance_type: mac_mini_m1
     environment:
-      xcode: 13.4.1
+      flutter: stable
+      xcode: latest
+      cocoapods: default
       groups:
         - google_credentials
       vars:
