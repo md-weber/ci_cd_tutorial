@@ -2,15 +2,15 @@ workflows:
   android-workflow:
     name: Android Workflow
     instance_type: mac_mini_m1
-    max_build_duration: 120
+    max_build_duration: 30
     environment:
       groups:
-        - google_credentials # <-- (Includes GCLOUD_KEY_FILE, GOOGLE_CREDENTIALS)
-      vars:
-        FIREBASE_PROJECT: "fe-community-dev"
+        - google_credentials
       flutter: stable
       xcode: latest
       cocoapods: default
+      vars:
+        FIREBASE_PROJECT: "flutter-explained-ci-cd"
     scripts:
       - name: Get Flutter packages
         script: |
@@ -24,16 +24,13 @@ workflows:
           cd android
           ./gradlew app:assembleAndroidTest
           ./gradlew app:assembleDebug -Ptarget="$CM_BUILD_DIR/integration_test/app_test.dart"
-      - name: Run Firebase Test Lab tests
+      - name: Run Firebase Test Lab Tests
         script: |
           set -ex
-
           echo $GCLOUD_KEY_FILE | base64 --decode > ./gcloud_key_file.json
-
           gcloud auth activate-service-account --key-file=gcloud_key_file.json
-
-          gcloud --quiet config set project $FIREBASE_PROJECT
-
+          gcloud --quite config set project $FIREBASE_PROJECT
+          
           gcloud firebase test android run \
             --type instrumentation \
             --app build/app/outputs/apk/debug/app-debug.apk \
@@ -44,46 +41,4 @@ workflows:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
       - flutter_drive.log
-  ios-workflow:
-    name: iOS Workflow
-    instance_type: mac_mini_m1
-    environment:
-      flutter: stable
-      xcode: latest
-      cocoapods: default
-      groups:
-        - google_credentials
-      vars:
-        FIREBASE_PROJECT: "fe-community-dev"
-        BUNDLE_ID: "dev.flutterexplained.cicdtutorial"
-        TEST_BUNDLE_ID: "dev.flutterexplained.cicdtutorial.uitests.xctrunner"
-    scripts:
-      - name: Configure Firebase access
-        script: |
-          set -e
-          echo $GCLOUD_KEY_FILE | base64 --decode > ./gcloud_key_file.json          
-          gcloud auth activate-service-account --key-file=gcloud_key_file.json
-          gcloud --quiet config set project $FIREBASE_PROJECT
-      - name: Build app for testing
-        script: |
-          set -ex
-          
-          flutter build ios integration_test/app_test.dart --release
-          
-          cd ios
-          xcodebuild \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -config Flutter/Release.xcconfig \
-            -derivedDataPath "../build/ios_integ" \
-            -sdk iphoneos \
-            build-for-testing
-      - name: Package tests bundle
-        script: |
-          set -ex
-          cd ./build/ios_integ/Build/Products
-          zip -r "ios_tests.zip" *-iphoneos *.xctestrun
-      - name: Run tests in Firebase Test Lab
-        script: gcloud firebase test ios run --test "build/ios_integ/Build/Products/ios_tests.zip"
-    artifacts:
-      - "**/ios_tests.zip"
+
