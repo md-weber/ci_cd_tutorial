@@ -1,4 +1,4 @@
-package com.example.myapp;
+package dev.flutterexplained.ci_cd_tutorial;
 
 import androidx.test.rule.ActivityTestRule;
 import dev.flutter.plugins.integration_test.FlutterTestRunner;
