@@ -69,13 +69,6 @@ workflows:
           echo $GCLOUD_KEY_FILE | base64 --decode > ./gcloud_key_file.json          
           gcloud auth activate-service-account --key-file=gcloud_key_file.json
           gcloud --quiet config set project $FIREBASE_PROJECT
-
-      - keychain initialize
-      - app-store-connect fetch-signing-files ${BUNDLE_ID} --create
-      - app-store-connect fetch-signing-files ${TEST_BUNDLE_ID} --create
-      - keychain add-certificates
-      - xcode-project use-profiles --code-signing-setup-verbose-logging
-
       - name: Build app for testing
         script: |
           set -ex
