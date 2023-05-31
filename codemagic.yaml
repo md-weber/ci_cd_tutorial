@@ -57,12 +57,11 @@ workflows:
     environment:
       xcode: 13.4.1
       groups:
-        - ios_credentials
         - gcloud_credentials
       vars:
         FIREBASE_PROJECT: "fe-community-dev"
         BUNDLE_ID: "dev.flutterexplained.cicdtutorial"
-        TEST_BUNDLE_ID: "io.codemagic.ftlflutter.uitests.xctrunner"
+        TEST_BUNDLE_ID: "dev.flutterexplained.cicdtutorial.uitests.xctrunner"
     scripts:
       - name: Configure Firebase access
         script: |
