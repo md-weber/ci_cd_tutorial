@@ -66,7 +66,7 @@ workflows:
       - name: Configure Firebase access
         script: |
           set -e
-          echo $GCLOUD_KEY_FILE > ./gcloud_key_file.json          
+          echo $GCLOUD_KEY_FILE | base64 --decode > ./gcloud_key_file.json          
           gcloud auth activate-service-account --key-file=gcloud_key_file.json
           gcloud --quiet config set project $FIREBASE_PROJECT
 
